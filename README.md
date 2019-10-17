@@ -1,6 +1,5 @@
 # THAP1
-
-# QC and Alignment
+## QC and Alignment
 
 ## copy files to directory /data/talkowski/broadIncoming/HL3WWDSXX_reDemultiplex/merged_fastqs/THAP1, merge fastqs from different lanes, and do fastQC
 
