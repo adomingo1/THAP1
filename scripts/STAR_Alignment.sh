@@ -1,16 +1,17 @@
 #!/bin/bash
 
 # script for STAR Alignment (modified from Rachita's script from /data/talkowski/Samples/PostMortem/scripts/Alignment.sh)
-# run in parent of raw_data/
+# run in parent of /trimmed/
 
 DIR=`pwd`
-DATADIR=$DIR/raw_data
+DATADIR=$DIR/trimmed
 WORKDIR=$DIR/alignments
 
 mkdir -p $WORKDIR/logs
 
 module load star/2.5.3
 
+cd $DATADIR
 for file in `ls */*.R1.fastq.gz`
 do
 
@@ -36,6 +37,6 @@ bsub -sla miket_sc -q big-multi -n 8 -M 50000 -J ${ID} \
       --alignIntronMax 0 \
       --quantMode GeneCounts \
       --outFileNamePrefix $WORKDIR/${ID}/${ID}. \
-      --readFilesIn $DATADIR/${ID}.R1.fastq.gz $DATADIR/${ID}.R2.fastq.gz"
+      --readFilesIn $DATADIR/${ID}/${ID}.R1.fastq.gz $DATADIR/${ID}/${ID}.R2.fastq.gz"
     
 done
