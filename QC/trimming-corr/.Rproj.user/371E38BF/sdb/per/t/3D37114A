@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "trim <- read.table(\"C54wt_1_TRIM.ReadsPerGene.out.tab.counts.txt\")\ncolnames(trim)=c(\"Gene\",\"Counts_Trimmed\")\n\nnotrim <- read.table(\"C54wt_1_NOTRIM.ReadsPerGene.out.tab.counts.txt\")\ncolnames(notrim)=c(\"Gene\",\"Counts_NoTrim\")\n\ndf <- merge(trim,notrim,by.x=\"Gene\")\ncor.test(df$Counts_Trimmed, df$Counts_NoTrim, method=c(\"pearson\", \"kendall\", \"spearman\"))\n\nlibrary(\"ggpubr\")\nggscatter(df, x = \"Counts_Trimmed\", y = \"Counts_NoTrim\", conf.int = TRUE, \n          cor.coef = TRUE, cor.method = \"pearson\",\n          xlab = \"Counts_Trimmed\", ylab = \"Counts_NoTrim\")\n\n# using only >10\n\nlibrary(dplyr)\ntrim_nonzero <- filter(trim,Counts_Trimmed>10)\nnotrim_nonzero <- filter(notrim,Counts_NoTrim>10)\n\ndf_nonzero <- merge(trim_nonzero,notrim_nonzero,by.x=\"Gene\", all.y = TRUE)\ndf_nonzero[is.na(df_nonzero)] <- 0\n\nggscatter(df_nonzero, x = \"Counts_Trimmed\", y = \"Counts_NoTrim\", conf.int = TRUE, \n          cor.coef = TRUE, cor.method = \"pearson\",\n          xlab = \"Counts_Trimmed\", ylab = \"Counts_NoTrim\")\n",
+    "created" : 1571325574820.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2040115449",
+    "id" : "3D37114A",
+    "lastKnownWriteTime" : 1571341449,
+    "last_content_update" : 1571341449857,
+    "path" : "~/Documents/Projects/THAP1/Github/QC/trimming-corr/corr_script.R",
+    "project_path" : "corr_script.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

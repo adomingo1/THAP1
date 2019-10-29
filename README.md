@@ -1,8 +1,9 @@
 # THAP1
 ## QC and Alignment
 
-### merge fastqs from different lanes, and do fastQC
+### merge fastqs, and do fastQC
 
+```
 cd /data/talkowski/broadIncoming/HL3WWDSXX_reDemultiplex/merged_fastqs/THAP1
 
 while read sample file1 file2; do
@@ -20,24 +21,25 @@ mkdir ../fastQC
 cd ../fastQC
 mkdir logs
 
-### in directory merged_fastqs (note: use FastQC v0.11.7 from Rachita)
 
-for file in `ls *.fastq.gz`; do
+for file in `ls *.fastq.gz`; do #in /merged_fastqs
 bsub -q normal -sla miket_sc -o /data/talkowski/broadIncoming/HL3WWDSXX_reDemultiplex/merged_fastqs/THAP1/fastQC/logs/${file}_fastQC.out -e /data/talkowski/broadIncoming/HL3WWDSXX_reDemultiplex/merged_fastqs/THAP1/fastQC/logs/${file}_fastQC.err -J ${file} "/PHShome/ry077/downloads/FastQC/fastqc ${file} -o /data/talkowski/broadIncoming/HL3WWDSXX_reDemultiplex/merged_fastqs/THAP1/fastQC"
-done``
+done
 
-### in fastQC directory
 
 source activate py3
-multiqc .
+multiqc . #in /fastQC
+```
 
-### trimming (in THAP1 working directory)
+### trimming
 
+```
 cd /data/talkowski/Samples/THAP1/
 mkdir trimmed
 
 cd trimmed
 sh ../scripts/Trimmomatic.sh
+```
 
 ```
 #!/bin/bash
@@ -63,8 +65,9 @@ do
 done
 ```
 
-### fastqc post trimming (run in THAP1/trimmed/)
+### fastqc post trimming 
 
+```
 mkdir fastQC
 mkdir -p fastQC/logs
 
@@ -81,11 +84,14 @@ ID=${IDtemp##*/}
 echo ${ID}
 bsub -R 'hname!=cmu061 && hname!=cmu007 && hname!=cmu066' -q normal -sla miket_sc -o /data/talkowski/Samples/THAP1/trimmed/fastQC/logs/${ID}.R2.fastQC.out -e /data/talkowski/Samples/THAP1/trimmed/fastQC/logs/${ID}.R2.fastQC.err -J ${ID}.R2 "/PHShome/ry077/downloads/FastQC/fastqc ${file} -o /data/talkowski/Samples/THAP1/trimmed/fastQC"
 done
+```
 
 ### alignment
 
+```
 mkdir -p THAP1/alignments
 sh scripts/STAR_Alignment.sh
+```
 
 ```
 #!/bin/bash
@@ -130,6 +136,33 @@ bsub -sla miket_sc -q big-multi -n 8 -M 50000 -J ${ID} \
       --readFilesIn $DATADIR/${ID}/${ID}.R1.fastq.gz $DATADIR/${ID}/${ID}.R2.fastq.gz"
     
 done
+```
+
+### BAMQC
+
+```
+ls -1 alignments/*/*.Aligned.out.bam | sed "s?^?`pwd`?g" | awk -F"/" '{var=$NF;gsub(".Aligned.out.bam","",var); print $0,var}' OFS="\t" > THAP1.bam.list
+
+sh scripts/bamsummaries.sh THAP1
+```
+
+```
+#!/bin/bash
+
+source activate py2
+
+module load python/2.7.3
+module load libssl/1.0.2
+
+name=$1
+DIR=`pwd`
+scriptdir="/data/talkowski/Samples/PostMortem/scripts"
+analysisfolder=${DIR}"/BAMQC/RNAQC"
+mkdir -p $analysisfolder
+referencefolder="/data/talkowski/tools/ref/RNA-Seq/human/ref_components/GRCh37.75"
+
+
+python $scriptdir/multibamsummary.py -sp $scriptdir -af $analysisfolder -of $name -at rna -rf $referencefolder/Homo_sapiens.GRCh37.75.dna.primary_assembly.ercc.reordered.fa -G $referencefolder/Homo_sapiens.GRCh37.75.protein_coding -st fr-firststrand -f ${name}.bam.list -on ${name}.Summaries.txt -sj -sq big-multi
 ```
 
 ### getting counts
