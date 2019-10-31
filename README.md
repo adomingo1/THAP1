@@ -167,4 +167,24 @@ python $scriptdir/multibamsummary.py -sp $scriptdir -af $analysisfolder -of $nam
 
 ### getting counts
 
-tail -n +5 C54wt_1.ReadsPerGene.out.tab | cut -f1,2 > C54wt_1_NOTRIM.ReadsPerGene.out.tab.counts
+```
+for file in `ls -1 alignments/*/*ReadsPerGene.out.tab`; do \
+    IDtemp=${file%.ReadsPerGene.out.tab}
+	ID=${IDtemp##*/}
+    echo $ID
+    cat $file | tail -n +5 | cut -f4 > counts/$ID.count
+done
+
+
+
+tail -n +5 /data/talkowski/Samples/THAP1/alignments/S21wt_6/S21wt_6.ReadsPerGene.out.tab | cut -f1 > geneids.txt #in counts
+
+head geneids.txt
+
+paste geneids.txt *.count > tmp.out
+ls -1 *.count > samples.txt
+sed -i -e 's/.count//gi' samples.txt
+cat samples.txt | cut -f1 | paste -s > header.txt
+cat header.txt tmp.out > all_counts.txt
+
+```
