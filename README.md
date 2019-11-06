@@ -1,5 +1,5 @@
 # THAP1
-## QC and Alignment
+## QC and alignment
 
 ### merge fastqs, and do fastQC
 
@@ -65,7 +65,7 @@ do
 done
 ```
 
-### fastqc post trimming 
+### fastqc post-trimming 
 
 ```
 mkdir fastQC
@@ -138,7 +138,7 @@ bsub -sla miket_sc -q big-multi -n 8 -M 50000 -J ${ID} \
 done
 ```
 
-### BAMQC
+### post-alignment QC (BAMQC)
 
 ```
 ls -1 alignments/*/*.Aligned.out.bam | sed "s?^?`pwd`?g" | awk -F"/" '{var=$NF;gsub(".Aligned.out.bam","",var); print $0,var}' OFS="\t" > THAP1.bam.list
@@ -188,3 +188,21 @@ cat samples.txt | cut -f1 | paste -s > header.txt
 cat header.txt tmp.out > all_counts.txt
 
 ```
+
+### samtools to QC genotypes
+
+```
+mkdir -p snps/sorted
+cd snps/sorted
+cp ../../alignments/*/*.Aligned.out.rg.srtd.bam .
+cp ../../alignments/*/*.Aligned.out.rg.srtd.bai .
+
+
+for file in `ls -1 *.Aligned.out.rg.srtd.bam`; do
+echo $file
+samtools mpileup -g -t DP -r 8:42,691,816-42,698,467 -f /data/talkowski/tools/ref/RNA-Seq/human/ref_components/GRCh37.75/Homo_sapiens.GRCh37.75.dna.primary_assembly.ercc.reordered.fa $file | bcftools call -cv > /data/talkowski/Samples/THAP1/snps/$file.samtools.raw.bcf
+```
+
+
+
+

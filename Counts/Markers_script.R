@@ -1,7 +1,7 @@
 # to make heatmap using markers
 
 # read features
-read.csv("features_ry.csv", header=TRUE, row.names=1) -> features
+read.csv("features.csv", header=TRUE, row.names=1) -> features
 markers <- c(rownames(features))
 
 # subset, maintaining order in markers
@@ -13,7 +13,6 @@ meta_Genotype2 <- meta["Genotype2"]
 meta_Group <- meta["Group"]
 meta_Experiment<- meta["Experiment"]
 meta_3 <- meta[c("Genotype","Diff_batch")]
-
 
 #heatmap
 library(pheatmap)
