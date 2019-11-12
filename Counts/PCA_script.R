@@ -13,3 +13,5 @@ scores <- cbind(scores,meta)
 library(ggplot2)
 
 ggplot(data = scores[1:24,], aes(x = PC1, y = PC2, color = Diff_batch, shape = Experiment)) + geom_point(size=5)
+
+
